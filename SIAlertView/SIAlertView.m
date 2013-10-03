@@ -103,6 +103,7 @@ static SIAlertView *__si_alert_current_view;
 
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UILabel *messageLabel;
+
 @property (nonatomic, strong) UIView *containerView;
 @property (nonatomic, strong) NSMutableArray *buttons;
 
@@ -162,8 +163,8 @@ static SIAlertView *__si_alert_current_view;
             CGGradientRef gradient = CGGradientCreateWithColorComponents(colorSpace, colors, locations, locationsCount);
             CGColorSpaceRelease(colorSpace);
             
-            CGPoint center = CGPointMake(self.bounds.size.width / 2, self.bounds.size.height / 2);
-            CGFloat radius = MIN(self.bounds.size.width, self.bounds.size.height) ;
+            CGPoint center = CGPointMake(roundf(self.bounds.size.width / 2), roundf(self.bounds.size.height / 2));
+            CGFloat radius = roundf(MIN(self.bounds.size.width, self.bounds.size.height));
             CGContextDrawRadialGradient (context, gradient, center, 0, center, radius, kCGGradientDrawsAfterEndLocation);
             CGGradientRelease(gradient);
             break;
@@ -764,8 +765,8 @@ static SIAlertView *__si_alert_current_view;
 #endif
     
     CGFloat height = [self preferredHeight];
-    CGFloat left = (self.bounds.size.width - CONTAINER_WIDTH) * 0.5;
-    CGFloat top = (self.bounds.size.height - height) * 0.5;
+    CGFloat left = roundf((self.bounds.size.width - CONTAINER_WIDTH) * 0.5);
+    CGFloat top = roundf((self.bounds.size.height - height) * 0.5);
     self.containerView.transform = CGAffineTransformIdentity;
     self.containerView.frame = CGRectMake(left, top, CONTAINER_WIDTH, height);
     self.containerView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.containerView.bounds cornerRadius:self.containerView.layer.cornerRadius].CGPath;
@@ -839,23 +840,17 @@ static SIAlertView *__si_alert_current_view;
         }
     }
     height += CONTENT_PADDING_BOTTOM;
-	return height;
+	return roundf(height);
 }
 
 - (CGFloat)heightForTitleLabel
 {
     if (self.titleLabel) {
-        CGSize size = [self.title sizeWithFont:self.titleLabel.font
-                                   minFontSize:
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_6_0
-                       self.titleLabel.font.pointSize * self.titleLabel.minimumScaleFactor
-#else
-                       self.titleLabel.minimumFontSize
-#endif
-                                actualFontSize:nil
-                                      forWidth:CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2
+      CGFloat maxHeight = MESSAGE_MAX_LINE_COUNT * self.titleLabel.font.lineHeight;
+      CGSize size = [self.title sizeWithFont:self.titleLabel.font
+                             constrainedToSize:CGSizeMake(CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2, maxHeight)
                                  lineBreakMode:self.titleLabel.lineBreakMode];
-        return size.height;
+        return ceilf(size.height);
     }
     return 0;
 }
@@ -868,9 +863,9 @@ static SIAlertView *__si_alert_current_view;
         CGSize size = [self.message sizeWithFont:self.messageLabel.font
                                constrainedToSize:CGSizeMake(CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2, maxHeight)
                                    lineBreakMode:self.messageLabel.lineBreakMode];
-        return MAX(minHeight, size.height);
+        return ceilf(MAX(minHeight, size.height));
     }
-    return minHeight;
+    return ceilf(minHeight);
 }
 
 #pragma mark - Setup
@@ -911,20 +906,22 @@ static SIAlertView *__si_alert_current_view;
 {
 	if (self.title) {
 		if (!self.titleLabel) {
-			self.titleLabel = [[UILabel alloc] initWithFrame:self.bounds];
-			self.titleLabel.textAlignment = NSTextAlignmentCenter;
-            self.titleLabel.backgroundColor = [UIColor clearColor];
-			self.titleLabel.font = self.titleFont;
-            self.titleLabel.textColor = self.titleColor;
-            self.titleLabel.adjustsFontSizeToFitWidth = YES;
+      self.titleLabel = [[UILabel alloc] initWithFrame:self.bounds];
+      self.titleLabel.textAlignment = NSTextAlignmentCenter;
+      self.titleLabel.backgroundColor = [UIColor clearColor];
+      self.titleLabel.font = self.titleFont;
+      self.titleLabel.textColor = self.titleColor;
+      self.titleLabel.adjustsFontSizeToFitWidth = NO;
+      self.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
+      self.titleLabel.numberOfLines = 0;
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_6_0
-            self.titleLabel.minimumScaleFactor = 0.75;
+      self.titleLabel.minimumScaleFactor = 0.75;
 #else
-            self.titleLabel.minimumFontSize = self.titleLabel.font.pointSize * 0.75;
+      self.titleLabel.minimumFontSize = self.titleLabel.font.pointSize * 0.75;
 #endif
 			[self.containerView addSubview:self.titleLabel];
 #if DEBUG_LAYOUT
-            self.titleLabel.backgroundColor = [UIColor redColor];
+      self.titleLabel.backgroundColor = [UIColor redColor];
 #endif
 		}
 		self.titleLabel.text = self.title;
