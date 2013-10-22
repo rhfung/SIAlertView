@@ -304,6 +304,7 @@ static SIAlertView *__si_alert_current_view;
     appearance.destructiveButtonColor = [UIColor whiteColor];
     appearance.cornerRadius = 2;
     appearance.shadowRadius = 8;
+    appearance.transitionStyle = SIAlertViewTransitionStyleFade;
 }
 
 - (id)init
