@@ -32,7 +32,7 @@ const UIWindowLevel UIWindowLevelSIAlertBackground = 1998.0; // below the alert 
 @class SIAlertBackgroundWindow;
 
 static NSMutableArray *__si_alert_queue;
-static BOOL __si_alert_animating;
+static volatile BOOL __si_alert_animating;
 static SIAlertBackgroundWindow *__si_alert_background_window;
 static SIAlertView *__si_alert_current_view;
 
