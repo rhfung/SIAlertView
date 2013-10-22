@@ -17,6 +17,7 @@ An UIAlertView replacement with block syntax and fancy transition styles. As see
 - styled transitions
 - queue support
 - UIAppearance support
+- an accessoryView (UIView), e.g., an animatable UIImageView
 
 ## Installation
 
@@ -78,9 +79,30 @@ alertView.transitionStyle = SIAlertViewTransitionStyleBounce;
 [alertView show];
 ```
 
+Another example:
+
+```objc
+UIImageView* someImage = /* something of your own */;
+SIAlertView *alertView = [[SIAlertView alloc] initWithTitle:@"SIAlertView" 
+                                                 andMessage:@"Richard H Fung" 
+                                             andContentView:[[UIImageView alloc] initWithImage:someImage]];
+
+[alertView addButtonWithTitle:@"Button1"
+                         type:SIAlertViewButtonTypeDefault
+                      handler:^(SIAlertView *alert) {
+                          NSLog(@"Button1 Clicked");
+                      }];
+
+alertView.transitionStyle = SIAlertViewTransitionStyleBounce;
+alertView.accessoryView = someImage; /* alternative way to set up an accessoryView */
+
+[alertView show];
+```
+
 ## Credits
 
 SIAlertView was created by [Sumi Interactive](https://github.com/Sumi-Interactive) in the development of [Grid Diary](http://griddiaryapp.com/).
+SIAlertView is modified by [Richard H Fung](http://www.richardhfung.com/) for buidling iPhone apps.
 
 ## License
 
