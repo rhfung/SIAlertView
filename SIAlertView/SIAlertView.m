@@ -322,6 +322,17 @@ static SIAlertView *__si_alert_current_view;
 	return self;
 }
 
+// added a constructor that is compiler-compatible to
+// https://github.com/ghvillasboas/SIAlertView/commit/f27b39ad0bd1a913be3b218026cbef1d75d6541a
+- (id)initWithTitle:(NSString *)title andMessage:(NSString *)message andContentView:(UIView *)contentView
+{
+  self = [self initWithTitle:title andMessage:message];
+  if (self) {
+    _accessoryView = contentView;
+  }
+  return self;
+}
+
 #pragma mark - Class methods
 
 + (NSMutableArray *)sharedQueue
