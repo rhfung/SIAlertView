@@ -82,10 +82,10 @@ alertView.transitionStyle = SIAlertViewTransitionStyleBounce;
 Another example:
 
 ```objc
-UIImageView* someImage = /* something of your own */;
+UIImageView* someImageView = /* something of your own */;
 SIAlertView *alertView = [[SIAlertView alloc] initWithTitle:@"SIAlertView" 
                                                  andMessage:@"Richard H Fung" 
-                                             andContentView:[[UIImageView alloc] initWithImage:someImage]];
+                                             andContentView:someImageView];
 
 [alertView addButtonWithTitle:@"Button1"
                          type:SIAlertViewButtonTypeDefault
@@ -94,7 +94,7 @@ SIAlertView *alertView = [[SIAlertView alloc] initWithTitle:@"SIAlertView"
                       }];
 
 alertView.transitionStyle = SIAlertViewTransitionStyleBounce;
-alertView.accessoryView = someImage; /* alternative way to set up an accessoryView */
+alertView.accessoryView = someImageView; /* alternative way to set up an accessoryView */
 
 [alertView show];
 ```
