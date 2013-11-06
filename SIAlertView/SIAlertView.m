@@ -8,6 +8,7 @@
 
 #import "SIAlertView.h"
 #import <QuartzCore/QuartzCore.h>
+#import <OHAttributedLabel/OHAttributedLabel.h>
 
 NSString *const SIAlertViewWillShowNotification = @"SIAlertViewWillShowNotification";
 NSString *const SIAlertViewDidShowNotification = @"SIAlertViewDidShowNotification";
@@ -102,8 +103,8 @@ static SIAlertView *__si_alert_current_view;
 #endif
 @property (nonatomic, assign, getter = isVisible) BOOL visible;
 
-@property (nonatomic, strong) UILabel *titleLabel;
-@property (nonatomic, strong) UILabel *messageLabel;
+@property (nonatomic, strong) OHAttributedLabel *titleLabel;
+@property (nonatomic, strong) OHAttributedLabel *messageLabel;
 @property (nonatomic, strong) UIView* accessoryPlaceholderView; // contains accessoryView, if any
 
 @property (nonatomic, strong) UIView *containerView;
@@ -403,10 +404,22 @@ static SIAlertView *__si_alert_current_view;
 	[self invalidateLayout];
 }
 
+- (void)setAttributedTitle:(NSAttributedString *)attributedTitle
+{
+  _attributedTitle = attributedTitle;
+  [self invalidateLayout];
+}
+
 - (void)setMessage:(NSString *)message
 {
 	_message = message;
     [self invalidateLayout];
+}
+
+- (void)setAttributedMessage:(NSAttributedString *)attributedMessage
+{
+  _attributedMessage = attributedMessage;
+  [self invalidateLayout];
 }
 
 -(void)setAccessoryView:(UIView *)newAccessoryView{
@@ -821,6 +834,7 @@ static SIAlertView *__si_alert_current_view;
       }
 
       self.titleLabel.text = self.title;
+      self.titleLabel.attributedText = self.attributedTitle;
       CGFloat height = [self heightForTitleLabel];
       self.titleLabel.frame = CGRectMake(CONTENT_PADDING_LEFT, y, self.containerView.bounds.size.width - CONTENT_PADDING_LEFT * 2, height);
       y += height;
@@ -831,6 +845,7 @@ static SIAlertView *__si_alert_current_view;
             y += GAP;
         }
         self.messageLabel.text = self.message;
+        self.messageLabel.attributedText = self.attributedMessage;
         CGFloat height = [self heightForMessageLabel];
         self.messageLabel.frame = CGRectMake(CONTENT_PADDING_LEFT, y, self.containerView.bounds.size.width - CONTENT_PADDING_LEFT * 2, height);
         y += height;
@@ -962,7 +977,7 @@ static SIAlertView *__si_alert_current_view;
 {
 	if (self.title) {
 		if (!self.titleLabel) {
-      self.titleLabel = [[UILabel alloc] initWithFrame:self.bounds];
+      self.titleLabel = [[OHAttributedLabel alloc] initWithFrame:self.bounds];
       self.titleLabel.textAlignment = NSTextAlignmentCenter;
       self.titleLabel.backgroundColor = [UIColor clearColor];
       self.titleLabel.font = self.titleFont;
@@ -981,6 +996,7 @@ static SIAlertView *__si_alert_current_view;
 #endif
 		}
 		self.titleLabel.text = self.title;
+    self.titleLabel.attributedText = self.attributedTitle;
 	} else {
 		[self.titleLabel removeFromSuperview];
 		self.titleLabel = nil;
@@ -992,12 +1008,13 @@ static SIAlertView *__si_alert_current_view;
 {
     if (self.message) {
         if (!self.messageLabel) {
-            self.messageLabel = [[UILabel alloc] initWithFrame:self.bounds];
+            self.messageLabel = [[OHAttributedLabel alloc] initWithFrame:self.bounds];
             self.messageLabel.textAlignment = NSTextAlignmentCenter;
             self.messageLabel.backgroundColor = [UIColor clearColor];
             self.messageLabel.font = self.messageFont;
             self.messageLabel.textColor = self.messageColor;
-            self.messageLabel.numberOfLines = MESSAGE_MAX_LINE_COUNT;
+            self.messageLabel.numberOfLines = 0; // MESSAGE_MAX_LINE_COUNT;
+            self.messageLabel.lineBreakMode = NSLineBreakByWordWrapping;
             [self.containerView addSubview:self.messageLabel];
 #if DEBUG_LAYOUT
             self.messageLabel.backgroundColor = [UIColor redColor];
@@ -1018,6 +1035,7 @@ static SIAlertView *__si_alert_current_view;
       }
       
       self.messageLabel.text = self.message;
+      self.messageLabel.attributedText = self.attributedMessage;
     } else {
         [self.messageLabel removeFromSuperview];
         self.messageLabel = nil;

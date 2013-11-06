@@ -42,8 +42,30 @@ typedef void(^SIAlertViewHandler)(SIAlertView *alertView);
 
 @interface SIAlertView : UIView
 
+/**
+ * Assigns the title of this dialog if attributedTitle is nil. Can be nil.
+ */
 @property (nonatomic, copy) NSString *title;
+
+/**
+ * Assigns the message of this dialog if attributedMessage is nil. Can be nil.
+ */
 @property (nonatomic, copy) NSString *message;
+
+/**
+ * Assigns the attributedTitle of this dialog. Overrides title. Can be nil.
+ * If you are setting custom font attributes, you must also assign titleFont
+ * to compute dialog metrics.
+ */
+@property (nonatomic, copy) NSAttributedString* attributedTitle;
+
+/**
+ * Assigns the attributedMessage of this dialog. Overrides message. Can be nil.
+ * If you are setting custom font attributes, you must also assign messageFont
+ * to compute dialog metrics.
+ */
+@property (nonatomic, copy) NSAttributedString* attributedMessage;
+
 @property (nonatomic, strong) UIView* accessoryView;
 
 @property (nonatomic, assign) SIAlertViewTransitionStyle transitionStyle UI_APPEARANCE_SELECTOR; // default is SIAlertViewTransitionStyleFade
