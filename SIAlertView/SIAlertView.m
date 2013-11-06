@@ -7,6 +7,7 @@
 //
 
 #import "SIAlertView.h"
+#import "UIWindow+SIUtils.h"
 #import <QuartzCore/QuartzCore.h>
 #import <OHAttributedLabel/OHAttributedLabel.h>
 
@@ -37,61 +38,6 @@ static NSMutableArray *__si_alert_queue;
 static volatile BOOL __si_alert_animating;
 static SIAlertBackgroundWindow *__si_alert_background_window;
 static SIAlertView *__si_alert_current_view;
-
-@interface UIWindow (SIAlert_Utils)
-
-- (UIViewController *)currentViewController;
-
-@end
-
-@implementation UIWindow (SIAlert_Utils)
-
-- (UIViewController *)currentViewController
-{
-    UIViewController *viewController = self.rootViewController;
-    while (viewController.presentedViewController) {
-        viewController = viewController.presentedViewController;
-    }
-    return viewController;
-}
-
-@end
-
-#ifdef __IPHONE_7_0
-@interface UIWindow (SIAlert_StatusBarUtils)
-
-- (UIViewController *)viewControllerForStatusBarStyle;
-- (UIViewController *)viewControllerForStatusBarHidden;
-
-@end
-
-@implementation UIWindow (SIAlert_StatusBarUtils)
-
-- (UIViewController *)viewControllerForStatusBarStyle
-{
-    UIViewController *currentViewController = [self currentViewController];
-    
-    if ([currentViewController childViewControllerForStatusBarStyle]) {
-        return [currentViewController childViewControllerForStatusBarStyle];
-    } else {
-        return currentViewController;
-    }
-}
-
-- (UIViewController *)viewControllerForStatusBarHidden
-{
-    UIViewController *currentViewController = [self currentViewController];
-    
-    if ([currentViewController childViewControllerForStatusBarHidden]) {
-        return [currentViewController childViewControllerForStatusBarHidden];
-    } else {
-        return currentViewController;
-    }
-}
-
-@end
-#endif
-
 
 @interface SIAlertView ()
 
