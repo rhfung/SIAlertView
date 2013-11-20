@@ -369,7 +369,8 @@ static SIAlertView *__si_alert_current_view;
 }
 
 -(void)setAccessoryView:(UIView *)newAccessoryView{
-  _accessoryView = newAccessoryView;
+  UIView* tempView = newAccessoryView;
+  _accessoryView = tempView;
   [self invalidateLayout];
 }
 
