@@ -827,15 +827,18 @@ static SIAlertView *__si_alert_current_view;
 - (CGFloat)preferredHeight
 {
 	CGFloat height = CONTENT_PADDING_TOP;
-	if (self.title) {
-		height += [self heightForTitleLabel];
-	}
   if (self.accessoryView){
     if (height > CONTENT_PADDING_TOP) {
       height += GAP;
     }
     height += MIN(self.accessoryView.frame.size.height, ACCESSORY_MAX_HEIGHT);
+    if (self.title){
+      height += GAP;
+    }
   }
+	if (self.title) {
+		height += [self heightForTitleLabel];
+	}
   if (self.message) {
       if (height > CONTENT_PADDING_TOP) {
           height += GAP;
