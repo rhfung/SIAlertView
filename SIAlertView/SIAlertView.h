@@ -66,7 +66,16 @@ typedef void(^SIAlertViewHandler)(SIAlertView *alertView);
  */
 @property (nonatomic, copy) NSAttributedString* attributedMessage;
 
+/**
+ * An accessory view that appears above the title.
+ */
 @property (nonatomic, strong) UIView* accessoryView;
+
+/**
+ * Allows the background to interact with the first available button. 
+ * If no button is available, the dialog is dismissed and listen to willDismissHandler and didDismissHandler.
+ */
+@property (nonatomic, assign) BOOL backgroundRespondsToTouch;
 
 @property (nonatomic, assign) SIAlertViewTransitionStyle transitionStyle UI_APPEARANCE_SELECTOR; // default is SIAlertViewTransitionStyleFade
 @property (nonatomic, assign) SIAlertViewBackgroundStyle backgroundStyle; // default is SIAlertViewButtonTypeGradient

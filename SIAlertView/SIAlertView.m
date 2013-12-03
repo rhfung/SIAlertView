@@ -82,6 +82,7 @@ static SIAlertView *__si_alert_current_view;
 @interface SIAlertBackgroundWindow ()
 
 @property (nonatomic, assign) SIAlertViewBackgroundStyle style;
+@property (nonatomic, strong) UIButton* backgroundButton;
 
 @end
 
@@ -95,6 +96,8 @@ static SIAlertView *__si_alert_current_view;
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.opaque = NO;
         self.windowLevel = UIWindowLevelSIAlertBackground;
+        self.backgroundButton = [[UIButton alloc] initWithFrame:self.frame];
+        [self addSubview:self.backgroundButton];
     }
     return self;
 }
@@ -125,6 +128,11 @@ static SIAlertView *__si_alert_current_view;
             break;
         }
     }
+}
+
+- (void)layoutSubviews{
+  [super layoutSubviews];
+  self.backgroundButton.frame = self.frame;
 }
 
 @end
@@ -318,6 +326,7 @@ static SIAlertView *__si_alert_current_view;
                                                                              andStyle:[SIAlertView currentAlertView].backgroundStyle];
         [__si_alert_background_window makeKeyAndVisible];
         __si_alert_background_window.alpha = 0;
+
         [UIView animateWithDuration:0.3
                          animations:^{
                              __si_alert_background_window.alpha = 1;
@@ -425,6 +434,9 @@ static SIAlertView *__si_alert_current_view;
     
     // transition background
     [SIAlertView showBackground];
+    if (self.backgroundRespondsToTouch){
+      [__si_alert_background_window.backgroundButton addTarget:self action:@selector(backgroundPressed:) forControlEvents:UIControlEventTouchUpInside];
+    }
     
     SIAlertViewController *viewController = [[SIAlertViewController alloc] initWithNibName:nil bundle:nil];
     viewController.alertView = self;
@@ -458,6 +470,17 @@ static SIAlertView *__si_alert_current_view;
             [self dismissAnimated:YES cleanup:NO]; // dismiss to show next alert view
         }
     }];
+}
+
+- (void)backgroundPressed:(id)sender{
+  SIAlertItem* item = self.items.firstObject;
+  if (item && item.action){
+    // fire the action
+    item.action(self);
+  }else{
+    // apply a default behaviour to dismiss this dialog
+    [self dismissAnimated:YES];
+  }
 }
 
 - (void)dismissAnimated:(BOOL)animated
@@ -523,6 +546,7 @@ static SIAlertView *__si_alert_current_view;
         [self transitionOutCompletion:dismissComplete];
         
         if ([SIAlertView sharedQueue].count == 1) {
+            [__si_alert_background_window.backgroundButton removeTarget:self action:@selector(backgroundPressed:) forControlEvents:UIControlEventAllEvents];
             [SIAlertView hideBackgroundAnimated:YES];
         }
         
@@ -530,6 +554,7 @@ static SIAlertView *__si_alert_current_view;
         dismissComplete();
         
         if ([SIAlertView sharedQueue].count == 0) {
+            [__si_alert_background_window.backgroundButton removeTarget:self action:@selector(backgroundPressed:) forControlEvents:UIControlEventAllEvents];
             [SIAlertView hideBackgroundAnimated:YES];
         }
     }
