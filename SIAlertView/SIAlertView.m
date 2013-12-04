@@ -58,6 +58,8 @@ static SIAlertView *__si_alert_current_view;
 
 @property (nonatomic, assign, getter = isLayoutDirty) BOOL layoutDirty;
 
+@property (nonatomic, strong) UIButton* backgroundButton;
+
 + (NSMutableArray *)sharedQueue;
 + (SIAlertView *)currentAlertView;
 
@@ -82,7 +84,6 @@ static SIAlertView *__si_alert_current_view;
 @interface SIAlertBackgroundWindow ()
 
 @property (nonatomic, assign) SIAlertViewBackgroundStyle style;
-@property (nonatomic, strong) UIButton* backgroundButton;
 
 @end
 
@@ -96,8 +97,6 @@ static SIAlertView *__si_alert_current_view;
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.opaque = NO;
         self.windowLevel = UIWindowLevelSIAlertBackground;
-        self.backgroundButton = [[UIButton alloc] initWithFrame:self.frame];
-        [self addSubview:self.backgroundButton];
     }
     return self;
 }
@@ -128,11 +127,6 @@ static SIAlertView *__si_alert_current_view;
             break;
         }
     }
-}
-
-- (void)layoutSubviews{
-  [super layoutSubviews];
-  self.backgroundButton.frame = self.frame;
 }
 
 @end
@@ -434,10 +428,7 @@ static SIAlertView *__si_alert_current_view;
     
     // transition background
     [SIAlertView showBackground];
-    if (self.backgroundRespondsToTouch){
-      [__si_alert_background_window.backgroundButton addTarget:self action:@selector(backgroundPressed:) forControlEvents:UIControlEventTouchUpInside];
-    }
-    
+
     SIAlertViewController *viewController = [[SIAlertViewController alloc] initWithNibName:nil bundle:nil];
     viewController.alertView = self;
     
@@ -447,12 +438,13 @@ static SIAlertView *__si_alert_current_view;
         window.opaque = NO;
         window.windowLevel = UIWindowLevelSIAlert;
         window.rootViewController = viewController;
+
         self.alertWindow = window;
     }
     [self.alertWindow makeKeyAndVisible];
-    
+
     [self validateLayout];
-    
+
     [self transitionInCompletion:^{
         if (self.didShowHandler) {
             self.didShowHandler(self);
@@ -546,16 +538,22 @@ static SIAlertView *__si_alert_current_view;
         [self transitionOutCompletion:dismissComplete];
         
         if ([SIAlertView sharedQueue].count == 1) {
-            [__si_alert_background_window.backgroundButton removeTarget:self action:@selector(backgroundPressed:) forControlEvents:UIControlEventAllEvents];
-            [SIAlertView hideBackgroundAnimated:YES];
+          if (self.backgroundButton){
+            [self.backgroundButton removeTarget:self action:@selector(backgroundPressed:) forControlEvents:UIControlEventAllEvents];
+            [self.backgroundButton removeFromSuperview];
+          }
+          [SIAlertView hideBackgroundAnimated:YES];
         }
         
     } else {
         dismissComplete();
         
         if ([SIAlertView sharedQueue].count == 0) {
-            [__si_alert_background_window.backgroundButton removeTarget:self action:@selector(backgroundPressed:) forControlEvents:UIControlEventAllEvents];
-            [SIAlertView hideBackgroundAnimated:YES];
+          if (self.backgroundButton){
+            [self.backgroundButton removeTarget:self action:@selector(backgroundPressed:) forControlEvents:UIControlEventAllEvents];
+            [self.backgroundButton removeFromSuperview];
+          }
+          [SIAlertView hideBackgroundAnimated:YES];
         }
     }
     
@@ -771,7 +769,9 @@ static SIAlertView *__si_alert_current_view;
 #if DEBUG_LAYOUT
     NSLog(@"%@, %@", self, NSStringFromSelector(_cmd));
 #endif
-    
+
+    self.backgroundButton.frame = self.frame;
+
     CGFloat height = [self preferredHeight];
     CGFloat left = roundf((self.bounds.size.width - CONTAINER_WIDTH) * 0.5);
     CGFloat top = roundf((self.bounds.size.height - height) * 0.5);
@@ -939,6 +939,20 @@ static SIAlertView *__si_alert_current_view;
 
 - (void)setupContainerView
 {
+    // remove old background button
+    if (self.backgroundButton){
+      [self.backgroundButton removeFromSuperview];
+      self.backgroundButton = nil;
+    }
+
+    // create and attach a new button
+    self.backgroundButton = [[UIButton alloc] initWithFrame:self.frame];
+    [self addSubview:self.backgroundButton];
+
+    if (self.backgroundRespondsToTouch){
+      [self.backgroundButton addTarget:self action:@selector(backgroundPressed:) forControlEvents:UIControlEventTouchUpInside];
+    }
+
     self.containerView = [[UIView alloc] initWithFrame:self.bounds];
     self.containerView.backgroundColor = _viewBackgroundColor ? _viewBackgroundColor : [UIColor whiteColor];
     self.containerView.layer.cornerRadius = self.cornerRadius;
