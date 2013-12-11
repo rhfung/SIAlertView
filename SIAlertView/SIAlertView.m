@@ -1039,7 +1039,7 @@ static SIAlertView *__si_alert_current_view;
       CGSize size = self.accessoryView.frame.size;
       self.accessoryPlaceholderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
       self.accessoryPlaceholderView.backgroundColor = [UIColor clearColor];
-      self.accessoryPlaceholderView.clipsToBounds = YES;
+      self.accessoryPlaceholderView.clipsToBounds = NO;
       [self.containerView addSubview:self.accessoryPlaceholderView];
     }
     
