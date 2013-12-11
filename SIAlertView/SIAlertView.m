@@ -1010,19 +1010,8 @@ static SIAlertView *__si_alert_current_view;
 #endif
         }
 
-      // automatically switch between centering message text if one line
-      // or left-justifying text for a multiple-line message
-      CGFloat maxHeight = MESSAGE_MAX_LINE_COUNT * self.messageLabel.font.lineHeight;
-      CGSize size = [self.message sizeWithFont:self.messageLabel.font
-                             constrainedToSize:CGSizeMake(CONTAINER_WIDTH - CONTENT_PADDING_LEFT * 2, maxHeight)
-                                 lineBreakMode:self.messageLabel.lineBreakMode];
-      
-      if (size.height > self.messageLabel.font.lineHeight * 1.5){
-        self.messageLabel.textAlignment = NSTextAlignmentLeft;
-      }else{
-        self.messageLabel.textAlignment = NSTextAlignmentCenter;
-      }
-      
+      self.messageLabel.textAlignment = NSTextAlignmentCenter;
+
       self.messageLabel.text = self.message;
       self.messageLabel.attributedText = self.attributedMessage;
     } else {
