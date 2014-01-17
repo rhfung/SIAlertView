@@ -66,7 +66,7 @@ static SIAlertView *__si_alert_current_view;
 + (BOOL)isAnimating;
 + (void)setAnimating:(BOOL)animating;
 
-+ (void)showBackground;
++ (void)showBackgroundWithImage:(UIImage*)image;
 + (void)hideBackgroundAnimated:(BOOL)animated;
 
 - (void)setup;
@@ -84,6 +84,7 @@ static SIAlertView *__si_alert_current_view;
 @interface SIAlertBackgroundWindow ()
 
 @property (nonatomic, assign) SIAlertViewBackgroundStyle style;
+@property (atomic, strong) UIImage* backgroundImage;
 
 @end
 
@@ -125,6 +126,10 @@ static SIAlertView *__si_alert_current_view;
             [[UIColor colorWithWhite:0 alpha:0.5] set];
             CGContextFillRect(context, self.bounds);
             break;
+        }
+        case SIAlertViewBackgroundStyleImage:
+        {
+            [self.backgroundImage drawInRect:rect];
         }
     }
 }
@@ -313,13 +318,14 @@ static SIAlertView *__si_alert_current_view;
     __si_alert_animating = animating;
 }
 
-+ (void)showBackground
++ (void)showBackgroundWithImage:(UIImage*)image
 {
     if (!__si_alert_background_window) {
         __si_alert_background_window = [[SIAlertBackgroundWindow alloc] initWithFrame:[UIScreen mainScreen].bounds
                                                                              andStyle:[SIAlertView currentAlertView].backgroundStyle];
         [__si_alert_background_window makeKeyAndVisible];
         __si_alert_background_window.alpha = 0;
+        __si_alert_background_window.backgroundImage = image;
 
         [UIView animateWithDuration:0.3
                          animations:^{
@@ -427,7 +433,7 @@ static SIAlertView *__si_alert_current_view;
     [SIAlertView setCurrentAlertView:self];
     
     // transition background
-    [SIAlertView showBackground];
+    [SIAlertView showBackgroundWithImage:self.backgroundImage];
 
     SIAlertViewController *viewController = [[SIAlertViewController alloc] initWithNibName:nil bundle:nil];
     viewController.alertView = self;
