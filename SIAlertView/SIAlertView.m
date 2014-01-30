@@ -973,6 +973,7 @@ static SIAlertView *__si_alert_current_view;
 	if (self.title) {
 		if (!self.titleLabel) {
       self.titleLabel = [[OHAttributedLabel alloc] initWithFrame:self.bounds];
+      self.titleLabel.automaticallyAddLinksForType = 0;
       self.titleLabel.textAlignment = NSTextAlignmentCenter;
       self.titleLabel.backgroundColor = [UIColor clearColor];
       self.titleLabel.font = self.titleFont;
@@ -1004,6 +1005,7 @@ static SIAlertView *__si_alert_current_view;
     if (self.message) {
         if (!self.messageLabel) {
             self.messageLabel = [[OHAttributedLabel alloc] initWithFrame:self.bounds];
+            self.messageLabel.automaticallyAddLinksForType = 0;
             self.messageLabel.textAlignment = NSTextAlignmentCenter;
             self.messageLabel.backgroundColor = [UIColor clearColor];
             self.messageLabel.font = self.messageFont;
